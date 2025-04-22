@@ -13,19 +13,19 @@ proc timestamp {} {
 # Function to run after successful registration
 proc run_after_successful_registration {} {
     # This function contains the command to run after successful registration.
-    spawn pm2 restart miner_26
+    spawn pm2 ls
     expect "Process successfully started"
     exit 128
 }
 
 # Function for registration
 proc registration {} {
-    spawn btcli s register --subtensor.network finney --netuid 26 --wallet.name sn26 --wallet.hotkey sn26-hot
+    spawn btcli s register --subtensor.network finney --netuid 26 --wallet.name sn26 --wallet.hotkey sn26-hot -y
 
     # Log timestamp for registration attempt
     puts "[timestamp] Attempting registration..."
 
-    expect "Enter password to unlock key" {
+    expect "Enter your password:" {
         send "XXXXXXX\r"
         expect ""
     }
@@ -39,8 +39,8 @@ proc registration {} {
             puts "[timestamp] Error encountered: NotEnoughBalanceToStake or ❌ Failed. Restarting registration..."
             registration
         }
-        -re ".*RegistrationDisabled.*|.*❌ Failed.*" {
-            puts "Error encountered: RegistrationDisabled or ❌ Failed. Restarting registration..."
+        -re ".*35mSubstrateRequestException.*|.*❌ Failed.*" {
+            puts "Error encountered: 35mSubstrateRequestException or ❌ Failed. Restarting registration..."
             registration
         }
         -re ".*Registered.*" {
